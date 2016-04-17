@@ -6,6 +6,7 @@
 package com.sfnet.serverside.threads;
 
 import com.sfnet.serverside.Client;
+import com.sfnet.serverside.ServerStarter;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
@@ -23,7 +24,6 @@ import java.util.logging.Logger;
 public class ServerThread implements Runnable
 {
     ServerSocketChannel m_socket;
-    ArrayList<Client> m_clients = new ArrayList<Client>();
     
     public ServerThread(int port)
     {
@@ -52,6 +52,7 @@ public class ServerThread implements Runnable
         {
             
             // Accept new clients to the server
+            ArrayList<Client> m_clients = ServerStarter.getClients();
             try
             {
                 // Accept new clients
@@ -60,7 +61,7 @@ public class ServerThread implements Runnable
                 if(pendingSocket != null)
                 {
                     // Add a new client to our list of clients with a unique ID                    
-                    m_clients.add(new Client(pendingSocket, generateUniqueClientId()));
+                    ServerStarter.addClient(new Client(pendingSocket, generateUniqueClientId()));
                 }
                 
             } catch (IOException ex)
@@ -71,7 +72,11 @@ public class ServerThread implements Runnable
             // Receive any new packets from the client
             for(int i=0; i<m_clients.size(); i++)
             {
+                // Receive new messages from the clients
                 m_clients.get(i).receive();
+                // Send our queued packets to the clients
+                m_clients.get(i).sendQueuedPackets();
+                
             }
             
         }
@@ -85,6 +90,8 @@ public class ServerThread implements Runnable
      */
     private boolean isUnique(int id)
     {
+        ArrayList<Client> m_clients = ServerStarter.getClients();
+        
         for(int i=0; i<m_clients.size(); i++)
         {
             if(id == m_clients.get(i).getId())

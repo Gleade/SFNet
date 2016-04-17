@@ -18,18 +18,19 @@ import java.nio.ByteOrder;
 public class Packet
 {
     private ByteBuffer m_buffer;
-    private ByteArrayOutputStream m_byteOS;
     
     /**
      * Keep track of our current buffer size.
      */
     private int m_currentSize;
+    
+    private int m_readPos;
 
     
     public Packet()
     {
         m_currentSize = 0;
-        m_byteOS = new ByteArrayOutputStream();
+        m_readPos = 0;
         
     }
     
@@ -38,6 +39,8 @@ public class Packet
         m_currentSize = buffer.capacity();
         m_buffer = buffer;
         m_buffer.flip();
+        m_buffer.order(ByteOrder.LITTLE_ENDIAN);
+        m_readPos = 0;
     }
     
     /**
@@ -49,6 +52,7 @@ public class Packet
         // Write 1 byte to the buffer
         
         increaseBuffer(1);
+        
         m_buffer.put((byte)value);
     }
     
@@ -73,6 +77,8 @@ public class Packet
         // Increase the buffer by string length * 2 (char = 2 bytes each)
         // + 2 bytes for the string size
         increaseBuffer((str.length() * 2) + 2);
+        
+       // System.out.println("Prior size: " + ((str.length() * 2)+2));
         
         // Write the size of our string to the buffer
         m_buffer.putShort((short)(str.length() + 1));
@@ -112,9 +118,10 @@ public class Packet
             m_buffer.order(ByteOrder.LITTLE_ENDIAN);
 
             // Write the old data to the byte buffer
-            m_buffer.put(data, 0, data.length);
+            //m_buffer.put(data, 0, data.length);
+            m_buffer.position(0);
+            m_buffer.put(data);
             
-            data = null;
         }
         else
         {
@@ -122,13 +129,16 @@ public class Packet
             m_buffer.order(ByteOrder.LITTLE_ENDIAN);
         }
         
+        
         //System.out.println("[Packet][BBUFF Size: " + m_buffer.capacity());
      
     }
     
     public byte readbyte()
     {
-        return m_buffer.get(m_buffer.position());
+        byte result = m_buffer.get(m_buffer.position());
+        m_buffer.position(m_buffer.position() + 1);
+        return result;
     }
     
     /**
@@ -139,13 +149,13 @@ public class Packet
     {
         String finalStr = "";
         int strSize = readshort();
-        System.out.println(strSize);
         for(int i=0; i < strSize-1; i++)
         {
             char tempChar =  m_buffer.getChar();
-            System.out.println(tempChar);
             finalStr += String.valueOf(tempChar);
         }
+        
+        
         
         return finalStr;
     }

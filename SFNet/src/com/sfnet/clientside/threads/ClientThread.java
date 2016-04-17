@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +33,7 @@ public class ClientThread implements Runnable
         try
         {
             m_socket = SocketChannel.open();
+            m_socket.configureBlocking(false);
         } catch (IOException ex)
         {
             Logger.getLogger(ClientThread.class.getName()).log(Level.SEVERE, null, ex);
@@ -42,11 +45,6 @@ public class ClientThread implements Runnable
             
             // Wait for the connection to finalize
             while(!m_socket.finishConnect());
-      
-            m_packet = new Packet();
-            m_packet.writebyte((byte)25);
-
-            sendTcp(m_packet);
             
         } catch (IOException ex)
         {
@@ -65,16 +63,21 @@ public class ClientThread implements Runnable
         while(m_socket.isOpen())
         {
             
+            sendPacketStack();
+            
             try
             {
+                // Read our socket if possible
                 int bytesAvailible = m_socket.read(m_bbuffer);
              
 
                 if(bytesAvailible > 0)
                 {
+                    // Set our packets byte buffer to the read one.
                     Packet packet = new Packet(m_bbuffer);
-                    System.out.println("A new packet was received.");
-                    System.out.println(packet.readshort());
+                    
+                    // Execute our listeners receive functions
+                    ClientStarter.executeListeners(packet);
                 }
 
             } catch (IOException ex)
@@ -82,6 +85,25 @@ public class ClientThread implements Runnable
                 System.out.println("Unable to receive from server");
                 Logger.getLogger(ClientStarter.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+       
+            
+        }
+    }
+    
+    /**
+     * Send all packets waiting in queue to the server.
+     */
+    private void sendPacketStack()
+    {
+        // Get our packet stack
+        LinkedList<Packet> m_packets = ClientStarter.getPacketStack();
+        
+        // Send all packets to the server in the queue
+        while(!m_packets.isEmpty())
+        {
+            Packet packet = m_packets.pop();
+            sendTcp(packet);
             
         }
     }
@@ -94,7 +116,7 @@ public class ClientThread implements Runnable
             buff.flip();
             while (buff.hasRemaining()) 
             {
-                System.out.println(m_socket.write(buff));
+                m_socket.write(buff);
             }
         } catch (IOException ex)
         {
