@@ -11,26 +11,22 @@ Currently supports:
 
 
 Example:
-
 /**
-    Test Package
+    Main
 **/
 
-public class Test
+public static void main(String args[])
 {
-    public static void main(String args[])
-    {
-        System.out.println("Server.");
-        ServerStarter.listen(1337);
-        ServerStarter.addListener(new ExampleServerListener());
-        ClientStarter.connect("127.0.0.1", 1337);
-        ClientStarter.addListener(new ExampleClientListener());
-        
-        Packet testPacket = new Packet();
-        testPacket.writebyte((byte)1);
-        testPacket.writestring("Hello World!");
-        ClientStarter.sendPacket(testPacket);
-    }
+    System.out.println("Server.");
+    ServerStarter.listen(1337);
+    ServerStarter.addListener(new ExampleServerListener());
+    ClientStarter.connect("127.0.0.1", 1337);
+    ClientStarter.addListener(new ExampleClientListener());
+    
+    Packet testPacket = new Packet();
+    testPacket.writebyte((byte)1);
+    testPacket.writestring("Hello World!");
+    ClientStarter.sendPacket(testPacket);
 }
 
 /**
