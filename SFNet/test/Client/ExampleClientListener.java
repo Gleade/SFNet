@@ -22,7 +22,7 @@ public class ExampleClientListener implements SocketListener
     {
         // Get the message ID of the packet
         int messageId = packet.readbyte();
-        System.out.println(messageId + 1);
+
         switch(messageId)
         {
             // Receive a string based message from a player

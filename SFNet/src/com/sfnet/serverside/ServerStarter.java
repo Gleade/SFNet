@@ -19,6 +19,7 @@ import java.util.ArrayList;
 public class ServerStarter
 {
     public static int MAX_BUFFER_SIZE = 1024;
+    public static int PING_TIME = 5000;
     
     static private ArrayList<SocketListener> m_listeners;
     

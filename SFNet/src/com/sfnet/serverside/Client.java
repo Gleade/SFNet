@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,9 +26,14 @@ public class Client
 {
     private SocketChannel m_socket;
     private int m_id;
+    private boolean m_isConnected;
     private ByteBuffer m_bbuffer;
     private Packet m_packet;
     private LinkedList<Packet> m_packets;
+    
+    // Ping timers
+    long m_currentTime;
+    
     public Client(SocketChannel sock, int id) throws IOException
     {
         m_socket = sock;
@@ -35,6 +41,7 @@ public class Client
         m_socket.configureBlocking(false);
         m_bbuffer = ByteBuffer.allocate(ServerStarter.MAX_BUFFER_SIZE);
         m_packets = new LinkedList<Packet>();
+        m_currentTime  = System.currentTimeMillis();
     }
     
     /**
@@ -74,10 +81,26 @@ public class Client
                 ServerStarter.executeListeners(packet);
             }
             
+            m_isConnected = true;
         } catch (IOException ex)
         {
+            m_isConnected = false;
             System.out.println("Unable to receive from client: " + m_id);
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void ping()
+    {
+        long time = System.currentTimeMillis() - m_currentTime ;
+
+        if(time >= ServerStarter.PING_TIME)
+        {
+            System.out.println("Sent PING");
+            m_packet = new Packet();
+            m_packet.writebyte((byte)-126);
+            sendTcp(m_packet);
+            m_currentTime  = System.currentTimeMillis();
         }
     }
     
@@ -95,15 +118,44 @@ public class Client
             {
                 m_socket.write(buff);
             }
+            
+            m_isConnected = true;
+            
         } catch (IOException ex)
         {
+            try
+            {
+                m_isConnected = false;
+                m_socket.close();
+            } catch (IOException ex1)
+            {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex1);
+            }
             Logger.getLogger(ClientThread.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * Get the clients socket channel.
+     * @return 
+     */
+    public SocketChannel getSocketChannel()
+    {
+        return m_socket;
     }
     
     public int getId()
     {
         return m_id;
+    }
+    
+    /**
+     * Check if the connection is still connected or not.
+     * @return 
+     */
+    public boolean isConnected()
+    {
+        return m_isConnected;
     }
     
     

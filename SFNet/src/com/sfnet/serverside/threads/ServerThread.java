@@ -9,11 +9,11 @@ import com.sfnet.serverside.Client;
 import com.sfnet.serverside.ServerStarter;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
+import java.time.*;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 public class ServerThread implements Runnable
 {
     ServerSocketChannel m_socket;
+
     
     public ServerThread(int port)
     {
@@ -70,13 +71,26 @@ public class ServerThread implements Runnable
             }
             
             // Receive any new packets from the client
-            for(int i=0; i<m_clients.size(); i++)
+            for(int i =0; i < m_clients.size(); i++)
             {
-                // Receive new messages from the clients
-                m_clients.get(i).receive();
-                // Send our queued packets to the clients
-                m_clients.get(i).sendQueuedPackets();
+                // Get our client
+                Client client = m_clients.get(i);
                 
+                // Check if the client is connected before we do anything
+                if(client.isConnected())
+                {
+                    // Receive new messages from the clients
+                    client.receive();
+                    // Send our queued packets to the clients
+                    client.sendQueuedPackets();
+                    // Ping our clients
+                    client.ping();
+                }
+                else
+                {
+                    // Remove the disconnected client(s)
+                    ServerStarter.removeClient(client.getId());
+                }
             }
             
         }
