@@ -11,10 +11,9 @@ Currently supports:
 
 
 Example:
-/**
     Main
-**/
 
+```java
 public static void main(String args[])
 {
     System.out.println("Server.");
@@ -29,10 +28,12 @@ public static void main(String args[])
     ClientStarter.sendPacket(testPacket);
 }
 
-/**
-    Client Listener
-**/
+```
 
+
+    Client Listener
+    
+```java
 public class ExampleClientListener implements SocketListener
 {
 
@@ -61,10 +62,12 @@ public class ExampleClientListener implements SocketListener
     
 }
 
-/**
-   Server Listener
-**/
+```
 
+
+   Server Listener
+   
+```java
 public class ExampleServerListener implements SocketListener
 {
 
@@ -92,3 +95,4 @@ public class ExampleServerListener implements SocketListener
     }
     
 }
+```
