@@ -36,6 +36,9 @@ public class ClientStarter
 {
     public static int MAX_BUFFER_SIZE = 1024;
     
+    // Bytes sent in total
+    private static int m_bytesSent = 0;
+    
     
     // Our listeners that will receive our packets
     static private ArrayList<SocketListener> m_listeners;
@@ -47,6 +50,9 @@ public class ClientStarter
     
     // Our connection status
     static public boolean isConnected = false;
+    
+    // Our internal connection status that is used to disconnect the client (our thread checks this bool)
+    static public boolean m_internalConnected = true;
     
     /**
      * Connect to the desired ip address / port combonation.
@@ -101,6 +107,24 @@ public class ClientStarter
      */
     public static void sendPacket(Packet packet)
     {
+        // Add to our bytes sent
+        m_bytesSent += packet.getSize();
+        
+        // Add the packet to our packets queue
         m_packets.add(packet);
+    }
+    
+    /**
+     * Increase our bytes sent.
+     * @param size 
+     */
+    public static void addToBytesSent(int size)
+    {
+        m_bytesSent += size;
+    }
+    
+    public static void disconnect()
+    {
+        m_internalConnected = false;
     }
 }

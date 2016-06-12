@@ -4,16 +4,19 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/G:/Projects/LIBS/SFNet/test/Client/ExampleClientListener.java</file>
-            <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/clientside/threads/ClientThread.java</file>
-            <file>file:/G:/Projects/LIBS/SFNet/test/Server/ExampleServerListener.java</file>
             <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/clientside/ClientStarter.java</file>
-            <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/serverside/threads/ServerThread.java</file>
-            <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/serverside/ServerStarter.java</file>
             <file>file:/G:/Projects/LIBS/SFNet/test/Test.java</file>
             <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/utils/Packet.java</file>
             <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/socket/SocketListener.java</file>
-            <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/serverside/Client.java</file>
             <file>file:/G:/Projects/LIBS/SFNet/src/Documentation.java</file>
+            <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/clientside/threads/ClientThread.java</file>
+            <file>file:/G:/Projects/LIBS/SFNet/test/Server/ExampleServerListener.java</file>
+            <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/serverside/database/Database.java</file>
+            <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/serverside/database/Column.java</file>
+            <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/serverside/threads/ServerThread.java</file>
+            <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/serverside/ServerStarter.java</file>
+            <file>file:/G:/Projects/LIBS/SFNet/test/Server/DatabaseManager.java</file>
+            <file>file:/G:/Projects/LIBS/SFNet/src/com/sfnet/serverside/Client.java</file>
         </group>
     </open-files>
 </project-private>

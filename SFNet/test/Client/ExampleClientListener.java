@@ -37,6 +37,7 @@ public class ExampleClientListener implements SocketListener
                 int y = packet.readbyte();
                 System.out.println("Player position update - x: " + x + " y: " + y);
                 break;
+
         }
     }
     

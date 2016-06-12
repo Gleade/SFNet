@@ -78,30 +78,49 @@ public class ClientThread implements Runnable
     {
         while(m_socket.isOpen())
         {
-            
-            sendPacketStack();
-            
-            try
+            // Check if the connection was closed via the Client Starter
+            if(!ClientStarter.m_internalConnected)
             {
-                // Read our socket if possible
-                int bytesAvailible = m_socket.read(m_bbuffer);
-             
-
-                if(bytesAvailible > 0)
+                try
                 {
-                    // Set our packets byte buffer to the read one.
-                    Packet packet = new Packet(m_bbuffer);
-                    
-                    // Execute our listeners receive functions
-                    ClientStarter.executeListeners(packet);
+                    m_socket.close();
+                } catch (IOException ex)
+                {
+                    Logger.getLogger(ClientThread.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
-            } catch (IOException ex)
-            {
-                System.out.println("Unable to receive from server");
-                Logger.getLogger(ClientStarter.class.getName()).log(Level.SEVERE, null, ex);
             }
+            else
+            {
             
+                sendPacketStack();
+
+                // Clear the byte buffer of any old data
+                m_bbuffer.clear();
+
+
+
+                try
+                {
+                    // Read our socket if possible
+                    int bytesAvailible = m_socket.read(m_bbuffer);
+
+
+                    if(bytesAvailible > 0)
+                    {
+                        // Set our packets byte buffer to the read one.
+                        Packet packet = new Packet(m_bbuffer);
+
+                        // Execute our listeners receive functions
+                        ClientStarter.executeListeners(packet);
+                    }
+
+                } catch (IOException ex)
+                {
+                    System.out.println("Unable to receive from server");
+                    Logger.getLogger(ClientStarter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            
+            }
        
             
         }
@@ -128,12 +147,15 @@ public class ClientThread implements Runnable
     {
         try
         {
+            
             ByteBuffer buff = packet.get();
-            buff.flip();
+            buff.position(0);
             while (buff.hasRemaining()) 
             {
-                m_socket.write(buff);
+                 m_socket.write(buff);
             }
+            
+            
         } catch (IOException ex)
         {
             Logger.getLogger(ClientThread.class.getName()).log(Level.SEVERE, null, ex);

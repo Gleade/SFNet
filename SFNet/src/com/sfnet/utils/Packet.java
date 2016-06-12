@@ -23,9 +23,8 @@
 
 package com.sfnet.utils;
 
-import java.io.ByteArrayOutputStream;
+import com.sfnet.serverside.ServerStarter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -56,7 +55,7 @@ public class Packet
     {
         m_currentSize = buffer.capacity();
         m_buffer = buffer;
-        m_buffer.flip();
+        m_buffer.position(0);
         m_buffer.order(ByteOrder.LITTLE_ENDIAN);
         m_readPos = 0;
     }
@@ -123,6 +122,14 @@ public class Packet
     {
         // Increase total size of the buffer
         m_currentSize += size;
+        
+        if(m_buffer == null)
+        {
+            m_buffer = ByteBuffer.allocate(ServerStarter.MAX_BUFFER_SIZE);
+            m_buffer.order(ByteOrder.LITTLE_ENDIAN);
+        }
+        
+        /*
        
         // Store the data to write to our new buffer
         if(m_buffer != null)
@@ -146,9 +153,7 @@ public class Packet
             m_buffer = ByteBuffer.allocate(size);
             m_buffer.order(ByteOrder.LITTLE_ENDIAN);
         }
-        
-        
-        //System.out.println("[Packet][BBUFF Size: " + m_buffer.capacity());
+        */
      
     }
     
@@ -198,7 +203,9 @@ public class Packet
     // Return the bute buffer as array
     private byte[] getBufferArray()
     {
-        return m_buffer.array();
+        byte [] extractedBytes = new byte [ServerStarter.MAX_BUFFER_SIZE];
+        extractedBytes = m_buffer.array();
+        return extractedBytes;
     }
     
     /**
@@ -208,7 +215,47 @@ public class Packet
      */
     public ByteBuffer get()
     {
+        // Get the data from our current buffer
+        byte [] data = new byte[m_buffer.capacity()];
+        data = m_buffer.array();
+
+
+        // Re-allocate a new buffer of the new size
+        m_buffer = ByteBuffer.allocate(m_currentSize);
+        m_buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+        // Write the old data to the byte buffer
+        m_buffer.position(0);
+        m_buffer.put(data, 0, m_currentSize);
+        
+        
         return m_buffer;
+    }
+    
+    /**
+     * Get the ByteBuffer in its current internal state.
+     * @return 
+     */
+    public ByteBuffer getByteBufferCurrentrState()
+    {
+        return m_buffer;
+    }
+    
+    /**
+     * Set the buffer position to 0.
+     */
+    public void zeroBufferPosition()
+    {
+        m_buffer.position(0);
+    }
+    
+    /**
+     * Get the current size of the packets buffer.
+     * @return 
+     */
+    public int getSize()
+    {
+        return m_currentSize;
     }
     
     /**
@@ -218,4 +265,5 @@ public class Packet
     {
         System.out.print(m_buffer.toString());
     }
+    
 }

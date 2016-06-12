@@ -27,11 +27,9 @@ import com.sfnet.serverside.Client;
 import com.sfnet.serverside.ServerStarter;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.time.*;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,12 +51,13 @@ public class ServerThread implements Runnable
             m_socket = ServerSocketChannel.open();
             m_socket.configureBlocking(false);
             m_socket.bind(new InetSocketAddress(port));
-            System.out.println("Listening on port: " + port);
+            ServerStarter.isListening = true;
 
             
             
         } catch (IOException ex)
         {
+            ServerStarter.isListening = false;
             System.out.println("Failed to listen on port: " + port);
             System.out.println(ex.getStackTrace());
         }
@@ -107,6 +106,7 @@ public class ServerThread implements Runnable
                 else
                 {
                     // Remove the disconnected client(s)
+                    System.out.println("Client disconnected: " + client.getId());
                     ServerStarter.removeClient(client.getId());
                 }
             }

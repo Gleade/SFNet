@@ -58,6 +58,7 @@ public class Client
         m_bbuffer = ByteBuffer.allocate(ServerStarter.MAX_BUFFER_SIZE);
         m_packets = new LinkedList<Packet>();
         m_currentTime  = System.currentTimeMillis();
+        m_isConnected = true;
     }
     
     /**
@@ -79,6 +80,10 @@ public class Client
      */
     public void sendPacket(Packet packet)
     {
+        // Add to our bytes sent counter
+        ServerStarter.addToBytesSent(packet.getSize());
+        
+        // Add the packet to our send queue
         m_packets.add(packet);
     }
     
@@ -94,6 +99,11 @@ public class Client
             {
                 m_bbuffer.order(ByteOrder.LITTLE_ENDIAN);
                 Packet packet = new Packet(m_bbuffer);
+
+                //System.out.println(bytesAvailable);
+                // Get the current state of the byte buffer and add the client ID to the end of it
+                packet.getByteBufferCurrentrState().putShort(bytesAvailable, (short) m_id);
+                //packet.zeroBufferPosition();
                 ServerStarter.executeListeners(packet);
             }
             
@@ -114,7 +124,7 @@ public class Client
         {
             System.out.println("Sent PING");
             m_packet = new Packet();
-            m_packet.writebyte((byte)-126);
+            m_packet.writebyte((byte)-128);
             sendTcp(m_packet);
             m_currentTime  = System.currentTimeMillis();
         }
@@ -128,8 +138,10 @@ public class Client
     {
         try
         {
+
             ByteBuffer buff = packet.get();
-            buff.flip();
+            buff.position(0);
+            
             while (buff.hasRemaining()) 
             {
                 m_socket.write(buff);

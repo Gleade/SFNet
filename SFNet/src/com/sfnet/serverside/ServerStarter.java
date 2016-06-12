@@ -38,6 +38,10 @@ public class ServerStarter
 {
     public static int MAX_BUFFER_SIZE = 1024;
     public static int PING_TIME = 5000;
+    public static boolean isListening = false;
+    
+    private static int m_bytesSent = 0;
+    private static int m_bytesReceived = 0;
     
     static private ArrayList<SocketListener> m_listeners;
     
@@ -51,6 +55,7 @@ public class ServerStarter
     public static void listen(int port)
     {
         m_listeners = new ArrayList<SocketListener>();
+        isListening = true;
         (new Thread(new ServerThread(port))).start();
     }
     
@@ -104,9 +109,33 @@ public class ServerStarter
         m_clients.remove(clientId);
     }
     
+    /**
+     * Get all of the clients connected and return them in an ArrayList.
+     * @return 
+     */
     public static ArrayList<Client>getClients()
     {
         return m_clients;
+    }
+    
+    /**
+     * Get the client that matches the provided ID.
+     * @param id
+     * @return 
+     */
+    public static Client getClient(int id)
+    {
+        // go through each client and find the one matching the id
+        for(int i=0; i < m_clients.size(); i++)
+        {
+            if(m_clients.get(i).getId() == id)
+            {
+                return m_clients.get(i);
+            }
+        }    
+        
+        // failed to find client
+        return null;
     }
     
     /**
@@ -116,9 +145,52 @@ public class ServerStarter
     public static void sendGlobalPacket(Packet packet)
     {
         for(Client client : m_clients)
-        {
+        {            
+            // Send the packet to the clients
             client.sendPacket(packet);
         }
+    }
+    
+    public static void isListening()
+    {
+        
+    }
+    
+    /**
+     * Returns the total amount of bytes sent over the network.
+     * @return 
+     */
+    public static int getSentByteCount()
+    {
+        return m_bytesSent;
+    }
+    
+    /**
+     * Returns the total amount of bytes received over the network.
+     * @return 
+     */
+    public static int getReceivedByteCount()
+    {
+        return m_bytesReceived;
+    }
+    
+    /**
+     * Append to the count of bytes sent.
+     * @param size 
+     */
+    public static void addToBytesSent(int size)
+    {
+        // Add the packets byte count to our bytes sent
+        m_bytesSent += size;
+    }
+    
+    /**
+     * Append to the count of bytes received.
+     * @param size 
+     */
+    public static void addToBytesRecieved(int size)
+    {
+        m_bytesReceived += size;
     }
     
     

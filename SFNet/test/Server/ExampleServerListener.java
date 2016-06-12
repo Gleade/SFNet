@@ -20,7 +20,8 @@ public class ExampleServerListener implements SocketListener
     public void received(Packet packet)
     {
         int messageId = packet.readbyte();
-
+        System.out.println("Received msg ID: " + messageId);
+  
         switch(messageId)
         {
             // Receive a string based message from a player

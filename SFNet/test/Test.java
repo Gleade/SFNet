@@ -34,12 +34,12 @@ public class Test
         testPacket.writestring("Hello World!");
         ClientStarter.sendPacket(testPacket);
         
-        try
+       /* try
         {
-            DatabaseManager.connect("localhost:3306", "dire", "root", "password");
+          //  DatabaseManager.connect("localhost:3306", "dire", "root", "password");
         } catch (SQLException ex)
         {
             Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
     }
 }
